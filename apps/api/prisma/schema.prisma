@@ -6,3 +6,112 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+enum Role {
+  OWNER
+  EDITOR
+  COMMENTER
+  VIEWER
+}
+
+enum PrincipalType {
+  USER
+  LINK
+}
+
+enum AuditActorType {
+  USER
+  SYSTEM
+}
+
+enum AuditAction {
+  DOCUMENT_CREATED
+  DOCUMENT_UPDATED
+  DOCUMENT_DELETED
+
+  PERMISSION_GRANTED
+  PERMISSION_REVOKED
+
+  DOCUMENT_SNAPSHOT_CREATED
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  grants PermissionGrant[]
+  audits AuditEvent[]      @relation("UserAuditEvents")
+}
+
+model Document {
+  id        String   @id @default(uuid())
+  title     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  grants    PermissionGrant[]
+  snapshots DocumentSnapshot[]
+  audits    AuditEvent[]       @relation("DocumentAuditEvents")
+}
+
+model PermissionGrant {
+  id String @id @default(uuid())
+
+  principalType PrincipalType
+  principalId   String
+
+  resourceType String // "DOCUMENT" (string on purpose)
+  resourceId   String
+
+  role Role
+
+  grantedAt DateTime  @default(now())
+  revokedAt DateTime?
+
+  grantedById String?
+  grantedBy   User?     @relation(fields: [grantedById], references: [id])
+  document    Document? @relation(fields: [documentId], references: [id])
+  documentId  String?
+
+  @@index([principalType, principalId])
+  @@index([resourceType, resourceId])
+  @@index([revokedAt])
+}
+
+model AuditEvent {
+  id String @id @default(uuid())
+
+  actorType AuditActorType
+  actorId   String?
+
+  action AuditAction
+
+  resourceType String
+  resourceId   String
+
+  metadata Json?
+
+  createdAt DateTime @default(now())
+
+  user     User?     @relation("UserAuditEvents", fields: [actorId], references: [id])
+  document Document? @relation("DocumentAuditEvents", fields: [resourceId], references: [id])
+
+  @@index([resourceType, resourceId])
+  @@index([actorType, actorId])
+  @@index([createdAt])
+}
+
+model DocumentSnapshot {
+  id         String   @id @default(uuid())
+  documentId String
+  state      Bytes
+  version    Int
+  createdAt  DateTime @default(now())
+
+  document Document @relation(fields: [documentId], references: [id])
+
+  @@unique([documentId, version])
+}
