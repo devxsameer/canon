@@ -12,6 +12,8 @@ build/
 .out/
 .next/
 coverage/
+# TypeScript incremental build cache
+*.tsbuildinfo
 
 # =========================
 # Turborepo

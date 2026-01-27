@@ -1,4 +1,4 @@
 export default {
-  '*.{ts,tsx,js,jsx}': ['eslint --fix', 'prettier --write'],
-  '*.{json,md,yml}': ['prettier --write'],
+  '*.{ts,tsx,js,jsx}': [() => 'turbo lint -- --fix --max-warnings=0'],
+  '*.{json,md,yml,yaml}': ['prettier --write'],
 };

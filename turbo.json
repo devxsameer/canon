@@ -2,13 +2,16 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", ".next/**"]
+      "outputs": ["dist/**", ".next/**", "!**/*.tsbuildinfo"]
     },
     "typecheck": {
-      "dependsOn": ["^typecheck"],
+      "dependsOn": ["^typecheck", "build"],
+      "inputs": ["**/*.ts", "**/*.tsx", "tsconfig*.json"],
       "outputs": []
     },
     "lint": {
+      "dependsOn": ["^lint"],
+      "inputs": ["**/*.ts", "**/*.tsx", "eslint.config.*"],
       "outputs": []
     },
     "test": {
