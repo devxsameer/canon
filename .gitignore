@@ -1,0 +1,66 @@
+# =========================
+# Dependencies
+# =========================
+node_modules/
+.pnpm-store/
+
+# =========================
+# Build outputs
+# =========================
+dist/
+build/
+.out/
+.next/
+coverage/
+
+# =========================
+# Turborepo
+# =========================
+.turbo/
+
+# =========================
+# Logs
+# =========================
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# =========================
+# Environment variables
+# =========================
+.env
+.env.*
+!.env.example
+
+# =========================
+# OS / Editor
+# =========================
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# =========================
+# Prisma
+# =========================
+prisma/migrations/**/migration.sql
+
+# =========================
+# Runtime state
+# =========================
+tmp/
+temp/
+
+# =========================
+# Client storage artifacts
+# =========================
+*.sqlite
+*.db
+
+# =========================
+# Misc
+# =========================
+*.log
