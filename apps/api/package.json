@@ -1,5 +1,5 @@
 {
-  "name": "@canon/api",
+  "name": "@repo/api",
   "private": true,
   "type": "module",
   "scripts": {
