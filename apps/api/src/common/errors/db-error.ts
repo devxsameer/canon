@@ -1,33 +1,28 @@
-import { ApiError } from './api-error.js';
+import { ConflictError, BadRequestError } from './http-errors.js';
 
-type PgErrorLike = {
-  code?: string;
-};
+type PgErrorLike = { code?: string };
 
 export function translateDbError(err: unknown): never {
-  if (typeof err !== 'object' || err === null || !('code' in err)) {
+  if (!err || typeof err !== 'object' || !('code' in err)) {
     throw err;
   }
 
-  const pgErr = err as PgErrorLike;
+  const code = (err as PgErrorLike).code;
 
-  switch (pgErr.code) {
+  switch (code) {
     case '23505':
-      throw new ApiError('Resource already exists', 409, 'UNIQUE_CONSTRAINT');
+      throw new ConflictError('Resource already exists');
 
     case '23503':
-      throw new ApiError(
-        'Invalid reference to related resource',
-        400,
-        'FOREIGN_KEY_CONSTRAINT',
-      );
+      throw new BadRequestError('Invalid reference to related resource');
 
     case '23502':
-      throw new ApiError('Missing required field', 400, 'NOT_NULL_CONSTRAINT');
+      throw new BadRequestError('Missing required field');
 
     case '22P02':
-      throw new ApiError('Invalid input format', 400, 'INVALID_INPUT');
-  }
+      throw new BadRequestError('Invalid input format');
 
-  throw err;
+    default:
+      throw err;
+  }
 }

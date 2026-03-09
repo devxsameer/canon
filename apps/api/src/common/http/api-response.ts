@@ -1,4 +1,4 @@
-export type ApiSuccess<T = unknown> = {
+export type ApiSuccess<T> = {
   success: true;
   data: T;
   meta?: Record<string, unknown>;
@@ -9,9 +9,8 @@ export type ApiErrorResponse = {
   error: {
     code: string;
     message: string;
-    issues?: Array<{
-      path: string;
-      message: string;
-    }>;
+    issues?: unknown;
   };
+  path: string;
+  timestamp: string;
 };

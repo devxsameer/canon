@@ -6,12 +6,15 @@ import { AppModule } from './app.module.js';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter.js';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    bufferLogs: true,
+  });
 
   app.useGlobalFilters(new GlobalExceptionFilter());
   app.enableShutdownHooks();
 
   await app.listen(process.env.PORT ?? 3000);
 }
+
 
 bootstrap();

@@ -1,31 +1,41 @@
-import { ApiError } from './api-error.js';
+import { ApiError } from "./base.error.js";
 
 export class BadRequestError extends ApiError {
-  constructor(message = 'Bad Request') {
-    super(message, 400, 'BAD_REQUEST');
+  statusCode = 400;
+  code = 'BAD_REQUEST';
+  constructor(message = 'Bad request') {
+    super(message);
   }
 }
 
 export class UnauthorizedError extends ApiError {
+  statusCode = 401;
+  code = 'UNAUTHORIZED';
   constructor(message = 'Unauthorized') {
-    super(message, 401, 'UNAUTHORIZED');
+    super(message);
   }
 }
 
 export class ForbiddenError extends ApiError {
+  statusCode = 403;
+  code = 'FORBIDDEN';
   constructor(message = 'Forbidden') {
-    super(message, 403, 'FORBIDDEN');
+    super(message);
   }
 }
 
 export class NotFoundError extends ApiError {
+  statusCode = 404;
+  code = 'NOT_FOUND';
   constructor(resource = 'Resource') {
-    super(`${resource} Not Found`, 404, 'NOT_FOUND');
+    super(`${resource} not found`);
   }
 }
 
 export class ConflictError extends ApiError {
-  constructor(message = 'Conflict occurred') {
-    super(message, 409, 'CONFLICT');
+  statusCode = 409;
+  code = 'CONFLICT';
+  constructor(message = 'Conflict') {
+    super(message);
   }
 }

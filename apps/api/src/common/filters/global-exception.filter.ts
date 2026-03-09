@@ -1,3 +1,4 @@
+// src/common/filters/global-exception.filter.ts
 import {
   ArgumentsHost,
   Catch,
@@ -6,36 +7,33 @@ import {
   HttpStatus,
   Logger,
 } from '@nestjs/common';
-import { Request, Response } from 'express'; // Ensure these are from express
+import { Request, Response } from 'express';
 import { ZodError } from 'zod';
 
-import { ApiError } from '../errors/api-error.js';
-import { translateDbError } from '../errors/db-error.js';
+import { ApiError } from '../errors/base.error.js';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
-  private readonly logger = new Logger('GlobalException');
+  private readonly logger = new Logger(GlobalExceptionFilter.name);
 
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
-    const response = ctx.getResponse<Response>();
-    const request = ctx.getRequest<Request>();
+    const res = ctx.getResponse<Response>();
+    const req = ctx.getRequest<Request>();
 
-    const errorResponse = {
-      success: false,
-      error: {
-        code: 'INTERNAL_SERVER_ERROR',
-        message: 'Something went wrong',
-        issues: undefined as unknown,
-      },
-    };
-
+    const timestamp = new Date().toISOString();
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
 
-    // 1️⃣ Handle Zod Validation
+    let errorBody: {
+      code: string;
+      message: string;
+      issues?: unknown;
+    };
+
+    // 1️⃣ Zod validation
     if (exception instanceof ZodError) {
-      status = HttpStatus.BAD_REQUEST;
-      errorResponse.error = {
+      status = 400;
+      errorBody = {
         code: 'VALIDATION_ERROR',
         message: 'Invalid request data',
         issues: exception.issues.map((e) => ({
@@ -44,46 +42,43 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         })),
       };
     }
-    // 2️⃣ Handle Custom ApiErrors or Translated DB Errors
+
+    // 2️⃣ Domain / operational errors
     else if (exception instanceof ApiError) {
       status = exception.statusCode;
-      errorResponse.error = {
+      errorBody = {
         code: exception.code,
         message: exception.message,
-        issues: undefined,
       };
     }
-    // 3️⃣ Handle standard NestJS HttpExceptions
+
+    // 3️⃣ Nest HttpExceptions
     else if (exception instanceof HttpException) {
       status = exception.getStatus();
-      const nestRes = exception.getResponse();
-      errorResponse.error = {
+      errorBody = {
         code: 'HTTP_EXCEPTION',
-        message:
-          typeof nestRes === 'string'
-            ? nestRes
-            : (nestRes as unknown as { message: string }).message || exception.message,
-        issues: undefined,
+        message: exception.message,
       };
     }
-    // 4️⃣ Fallback: Try translating DB errors if not already caught
-    else {
-      try {
-        translateDbError(exception);
-      } catch (translated) {
-        if (translated instanceof ApiError) {
-          // Recursive call or manual assignment to handle the translated error
-          return this.catch(translated, host);
-        }
-      }
 
-      // Log the actual unhandled error with stack trace
+    // 4️⃣ Programmer / unknown errors
+    else {
       this.logger.error(
-        `${request.method} ${request.url}`,
-        exception instanceof Error ? exception.stack : exception,
+        `${req.method} ${req.url}`,
+        exception instanceof Error ? exception.stack : String(exception),
       );
+
+      errorBody = {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Something went wrong',
+      };
     }
 
-    response.status(status).json(errorResponse);
+    res.status(status).json({
+      success: false,
+      error: errorBody,
+      path: req.url,
+      timestamp,
+    });
   }
 }
