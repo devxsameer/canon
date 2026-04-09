@@ -1,9 +1,8 @@
-import './config/env';
-
 import { NestFactory } from '@nestjs/core';
 
 import { AppModule } from './app.module.js';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter.js';
+import { env } from './config/env.js';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -13,8 +12,7 @@ async function bootstrap() {
   app.useGlobalFilters(new GlobalExceptionFilter());
   app.enableShutdownHooks();
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(env.PORT);
 }
-
 
 bootstrap();
