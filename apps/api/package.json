@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "echo RUNNING DEV && nest start --watch",
+    "dev": "nest start --watch",
     "build": "nest build",
     "start": "node dist/main.js",
     "lint": "eslint .",

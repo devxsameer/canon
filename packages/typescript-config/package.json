@@ -3,6 +3,6 @@
   "private": true,
   "exports": {
     "./base": "./base.json",
-    "./node": "./node.json"
+    "./nest": "./nest.json"
   }
 }

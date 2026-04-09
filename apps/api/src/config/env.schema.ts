@@ -9,7 +9,7 @@ const databaseUrl = z
 export const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
 
-  PORT: z.coerce.number().int().positive().max(65535).default(3000),
+  PORT: z.coerce.number().int().positive().max(65535).default(3001),
 
   DATABASE_URL: databaseUrl,
 });
