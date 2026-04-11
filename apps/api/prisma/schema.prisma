@@ -42,8 +42,9 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  grants PermissionGrant[]
-  audits AuditEvent[]      @relation("UserAuditEvents")
+  grants             PermissionGrant[]
+  audits             AuditEvent[]        @relation("UserAuditEvents")
+  documentOperations DocumentOperation[]
 }
 
 model Document {
@@ -51,10 +52,12 @@ model Document {
   title     String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  version   Int      @default(0)
 
-  grants    PermissionGrant[]
-  snapshots DocumentSnapshot[]
-  audits    AuditEvent[]       @relation("DocumentAuditEvents")
+  grants             PermissionGrant[]
+  snapshots          DocumentSnapshot[]
+  audits             AuditEvent[]        @relation("DocumentAuditEvents")
+  documentOperations DocumentOperation[]
 }
 
 model PermissionGrant {
@@ -96,8 +99,9 @@ model AuditEvent {
 
   createdAt DateTime @default(now())
 
-  user     User?     @relation("UserAuditEvents", fields: [actorId], references: [id])
-  document Document? @relation("DocumentAuditEvents", fields: [resourceId], references: [id])
+  user       User?     @relation("UserAuditEvents", fields: [actorId], references: [id])
+  document   Document? @relation("DocumentAuditEvents", fields: [documentId], references: [id])
+  documentId String?
 
   @@index([resourceType, resourceId])
   @@index([actorType, actorId])
@@ -114,4 +118,20 @@ model DocumentSnapshot {
   document Document @relation(fields: [documentId], references: [id])
 
   @@unique([documentId, version])
+}
+
+model DocumentOperation {
+  id         String  @id @default(uuid())
+  documentId String
+  userId     String?
+
+  // CRDT update (Yjs/Automerge binary)
+  data Bytes
+
+  createdAt DateTime @default(now())
+
+  document Document @relation(fields: [documentId], references: [id])
+  user     User?    @relation(fields: [userId], references: [id])
+
+  @@index([documentId, createdAt])
 }
