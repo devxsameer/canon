@@ -1,0 +1,12 @@
+{
+  "name": "@repo/crdt",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "packageManager": "pnpm@10.27.0",
+  "dependencies": {
+    "yjs": "^13.6.30"
+  }
+}
