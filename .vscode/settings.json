@@ -1,3 +1,4 @@
 {
-  "conventionalCommits.scopes": ["repo", "api", "schema", "web", "crdt"]
+  "conventionalCommits.scopes": ["repo", "api", "schema", "web", "crdt"],
+  "js/ts.tsdk.path": "node_modules/typescript/lib"
 }

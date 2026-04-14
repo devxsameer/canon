@@ -1,14 +1,11 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Outfit } from 'next/font/google';
 import './globals.css';
 import { cn } from '@/lib/utils';
 import { Providers } from './providers';
 import { Toaster } from '@/components/ui/sonner';
 
-const inter = Inter({
-  variable: '--font-sans',
-  subsets: ['latin'],
-});
+const outfit = Outfit({ subsets: ['latin'], variable: '--font-sans' });
 
 export const metadata: Metadata = {
   title: 'Canon',
@@ -21,10 +18,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn("dark", "font-sans", inter.variable)}>
+    <html lang="en" className={cn('font-sans', outfit.variable)}>
       <body
         className={cn(
-          inter.variable,
+          outfit.variable,
           'antialiased bg-background text-foreground font-sans selection:bg-primary/20',
         )}
       >
