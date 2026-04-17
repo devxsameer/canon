@@ -36,15 +36,47 @@ enum AuditAction {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  name      String?
+  id            String  @id @default(uuid())
+  email         String  @unique
+  name          String?
+  password      String?
+  avatar_url    String?
+  emailVerified Boolean @default(true)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   grants             PermissionGrant[]
   audits             AuditEvent[]        @relation("UserAuditEvents")
   documentOperations DocumentOperation[]
+  accounts           Account[]
+  sessions           Session[]
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  userId       String
+  refreshToken String
+  userAgent    String?
+  ip           String?
+  expiresAt    DateTime
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Account {
+  id     String @id @default(uuid())
+  userId String
+
+  provider          String // "google", "github"
+  providerAccountId String
+
+  accessToken  String?
+  refreshToken String?
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([provider, providerAccountId])
 }
 
 model Document {

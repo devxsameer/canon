@@ -1,17 +1,22 @@
-import 'dotenv/config';
+import 'dotenv/config.js';
 
-import { envSchema } from './env.schema.js';
+import z from 'zod';
 
-const parsed = envSchema.safeParse(process.env);
+import { type Env, envSchema } from './env.schema.js';
 
-if (!parsed.success) {
-  console.error('❌ Invalid environment variables:\n');
+function validateEnv(): Env {
+  const parsed = envSchema.safeParse(process.env);
 
-  for (const issue of parsed.error.issues) {
-    console.error(`- ${issue.path.join('.')}: ${issue.message}`);
+  if (!parsed.success) {
+    console.error('\nInvalid environment variables:\n');
+
+    console.error(z.prettifyError(parsed.error));
+
+    console.error('\nFix your .env file and restart.\n');
+    process.exit(1);
   }
 
-  process.exit(1);
+  return parsed.data;
 }
 
-export const env = parsed.data;
+export const env = Object.freeze(validateEnv());
